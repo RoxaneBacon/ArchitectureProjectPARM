@@ -238,6 +238,10 @@ end TCL_Generic;
     <comp lib="0" loc="(310,40)" name="Tunnel">
       <a name="label" val="Enable"/>
     </comp>
+    <comp lib="0" loc="(460,380)" name="Constant">
+      <a name="facing" val="south"/>
+      <a name="width" val="4"/>
+    </comp>
     <comp lib="0" loc="(500,210)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="Rm"/>
@@ -335,19 +339,19 @@ end TCL_Generic;
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="Choix de l'instruction"/>
     </comp>
-    <comp lib="8" loc="(160,694)" name="Text">
+    <comp lib="8" loc="(160,690)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="Note 2: RSB instruction has Rn as 1st operand."/>
     </comp>
-    <comp lib="8" loc="(253,700)" name="Text">
+    <comp lib="8" loc="(250,700)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="MUL instruction has Rn as 1st operand and Rdm as 2nd operand"/>
     </comp>
-    <comp lib="8" loc="(296,728)" name="Text">
+    <comp lib="8" loc="(295,725)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="For simplification purposes, Rm is used for 1st operand both here and in the ALU."/>
     </comp>
-    <comp lib="8" loc="(477,684)" name="Text">
+    <comp lib="8" loc="(475,680)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="Note: instructions that does not save the result will still have the second operand as the destination register, the ALU will copy the second register to the destination register"/>
     </comp>
@@ -373,6 +377,38 @@ end TCL_Generic;
     <wire from="(220,320)" to="(260,320)"/>
     <wire from="(220,390)" to="(260,390)"/>
     <wire from="(280,40)" to="(310,40)"/>
+    <wire from="(460,380)" to="(460,390)"/>
+    <wire from="(460,390)" to="(460,400)"/>
+    <wire from="(460,390)" to="(490,390)"/>
+    <wire from="(460,400)" to="(460,410)"/>
+    <wire from="(460,400)" to="(490,400)"/>
+    <wire from="(460,410)" to="(460,420)"/>
+    <wire from="(460,410)" to="(490,410)"/>
+    <wire from="(460,420)" to="(460,430)"/>
+    <wire from="(460,420)" to="(490,420)"/>
+    <wire from="(460,430)" to="(460,440)"/>
+    <wire from="(460,430)" to="(490,430)"/>
+    <wire from="(460,440)" to="(460,450)"/>
+    <wire from="(460,440)" to="(490,440)"/>
+    <wire from="(460,450)" to="(460,460)"/>
+    <wire from="(460,450)" to="(490,450)"/>
+    <wire from="(460,460)" to="(460,470)"/>
+    <wire from="(460,460)" to="(490,460)"/>
+    <wire from="(460,470)" to="(460,480)"/>
+    <wire from="(460,470)" to="(490,470)"/>
+    <wire from="(460,480)" to="(460,490)"/>
+    <wire from="(460,480)" to="(490,480)"/>
+    <wire from="(460,490)" to="(460,500)"/>
+    <wire from="(460,490)" to="(490,490)"/>
+    <wire from="(460,500)" to="(460,510)"/>
+    <wire from="(460,500)" to="(490,500)"/>
+    <wire from="(460,510)" to="(460,520)"/>
+    <wire from="(460,510)" to="(490,510)"/>
+    <wire from="(460,520)" to="(460,530)"/>
+    <wire from="(460,520)" to="(490,520)"/>
+    <wire from="(460,530)" to="(460,540)"/>
+    <wire from="(460,530)" to="(490,530)"/>
+    <wire from="(460,540)" to="(490,540)"/>
     <wire from="(500,210)" to="(530,210)"/>
     <wire from="(510,150)" to="(520,150)"/>
     <wire from="(510,330)" to="(530,330)"/>
