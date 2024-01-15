@@ -272,7 +272,7 @@
       <a name="appearance" val="classic"/>
       <a name="label" val="CarryIn"/>
     </comp>
-    <comp lib="0" loc="(1820,150)" name="Constant">
+    <comp lib="0" loc="(1830,150)" name="Constant">
       <a name="value" val="0x0"/>
     </comp>
     <comp lib="0" loc="(1880,40)" name="Tunnel">
@@ -1003,7 +1003,7 @@
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="Synthese des flags"/>
     </comp>
-    <comp lib="6" loc="(2448,38)" name="Text">
+    <comp lib="6" loc="(2445,35)" name="Text">
       <a name="font" val="SansSerif plain 12"/>
       <a name="text" val="Xnor à faire entre les entrées A et B (dernier bit de chaque) et la sortie ( dernier bit) ( Si A et B sont positifs, alors le résultat doit etre positif)  "/>
     </comp>
@@ -1110,7 +1110,7 @@
     <wire from="(1710,180)" to="(1950,180)"/>
     <wire from="(1710,60)" to="(1710,130)"/>
     <wire from="(1710,60)" to="(1950,60)"/>
-    <wire from="(1820,150)" to="(1960,150)"/>
+    <wire from="(1830,150)" to="(1960,150)"/>
     <wire from="(1880,110)" to="(1880,160)"/>
     <wire from="(1880,110)" to="(1960,110)"/>
     <wire from="(1880,160)" to="(1960,160)"/>
