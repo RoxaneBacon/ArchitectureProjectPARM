@@ -158,6 +158,9 @@ end TCL_Generic;
       <a name="label" val="Flags_In"/>
       <a name="width" val="4"/>
     </comp>
+    <comp lib="0" loc="(130,440)" name="Tunnel">
+      <a name="label" val="Clk"/>
+    </comp>
     <comp lib="0" loc="(150,240)" name="Pin">
       <a name="appearance" val="classic"/>
       <a name="label" val="Update_Mask"/>
@@ -166,6 +169,9 @@ end TCL_Generic;
     <comp lib="0" loc="(150,360)" name="Splitter">
       <a name="fanout" val="4"/>
       <a name="incoming" val="4"/>
+    </comp>
+    <comp lib="0" loc="(150,500)" name="Tunnel">
+      <a name="label" val="Rst"/>
     </comp>
     <comp lib="0" loc="(190,240)" name="Splitter">
       <a name="fanout" val="4"/>
@@ -243,10 +249,6 @@ end TCL_Generic;
       <a name="facing" val="east"/>
       <a name="label" val="Clk"/>
     </comp>
-    <comp lib="0" loc="(50,140)" name="Pin">
-      <a name="appearance" val="classic"/>
-      <a name="label" val="Rst"/>
-    </comp>
     <comp lib="0" loc="(510,270)" name="Tunnel">
       <a name="facing" val="north"/>
       <a name="label" val="Rst"/>
@@ -263,10 +265,6 @@ end TCL_Generic;
       <a name="facing" val="north"/>
       <a name="label" val="Rst"/>
     </comp>
-    <comp lib="0" loc="(60,100)" name="Pin">
-      <a name="appearance" val="classic"/>
-      <a name="label" val="Clk"/>
-    </comp>
     <comp lib="0" loc="(720,340)" name="Splitter">
       <a name="facing" val="west"/>
       <a name="fanout" val="4"/>
@@ -279,10 +277,12 @@ end TCL_Generic;
       <a name="output" val="true"/>
       <a name="width" val="4"/>
     </comp>
-    <comp lib="0" loc="(90,100)" name="Tunnel">
+    <comp lib="0" loc="(80,440)" name="Pin">
+      <a name="appearance" val="classic"/>
       <a name="label" val="Clk"/>
     </comp>
-    <comp lib="0" loc="(90,140)" name="Tunnel">
+    <comp lib="0" loc="(90,500)" name="Pin">
+      <a name="appearance" val="classic"/>
       <a name="label" val="Rst"/>
     </comp>
     <comp lib="4" loc="(480,180)" name="Register">
@@ -334,13 +334,11 @@ end TCL_Generic;
     <wire from="(470,360)" to="(480,360)"/>
     <wire from="(470,540)" to="(480,540)"/>
     <wire from="(470,690)" to="(480,690)"/>
-    <wire from="(50,140)" to="(90,140)"/>
     <wire from="(510,420)" to="(510,430)"/>
     <wire from="(540,210)" to="(650,210)"/>
     <wire from="(540,360)" to="(700,360)"/>
     <wire from="(540,500)" to="(670,500)"/>
     <wire from="(540,650)" to="(680,650)"/>
-    <wire from="(60,100)" to="(90,100)"/>
     <wire from="(650,210)" to="(650,350)"/>
     <wire from="(650,350)" to="(700,350)"/>
     <wire from="(670,370)" to="(670,500)"/>
@@ -348,5 +346,7 @@ end TCL_Generic;
     <wire from="(680,380)" to="(680,650)"/>
     <wire from="(680,380)" to="(700,380)"/>
     <wire from="(720,340)" to="(770,340)"/>
+    <wire from="(80,440)" to="(130,440)"/>
+    <wire from="(90,500)" to="(150,500)"/>
   </circuit>
 </project>
