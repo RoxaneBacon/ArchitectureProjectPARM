@@ -392,7 +392,7 @@ function asmBranch2(label: string, labels: Map<string, number>, lineNumber: numb
   if (calcul < 0) {
     imm11 = padLeftZeros((calcul >>> 0).toString(2).substring(21), 11);
   } else {
-    imm11 = padLeftZeros(calcul.toString(2), 8);
+    imm11 = padLeftZeros(calcul.toString(2), 11);
   }
   return `11100 ${imm11}`;
 }
