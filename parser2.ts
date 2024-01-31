@@ -211,51 +211,50 @@ function asm(line:string) {
     return null;
   })
   
-  if (!instruction) return
-  // console.log(`Invalid instruction: ${line}`)
+  if (!instruction) return ''
+  console.log(`Invalid instruction: ${line}`)
 
-  console.log(instruction.assemble, line);
+  console.log('\n'+instruction.assemble + ': '+ line);
 
   switch (instruction.assemble) {
     case 'asmRegisterOperation':
       const asmRegisterOperationBinary = asmRegisterOperation(opcode, parts[1], parts[2], parts[3])
       console.log(asmRegisterOperationBinary);
-      break;
+      return asmRegisterOperationBinary.replace(/\s/g, '');
 
     case 'asmSPStorage':
       const spOffset = extractSP(line);
       if (spOffset === null) throw new Error(`Invalid STR instruction: ${line}`);
       const asmSPStorageBinary = asmSPStorage(opcode, parts[1], spOffset)
       console.log(asmSPStorageBinary);
-      break;
+      return asmSPStorageBinary.replace(/\s/g, '');
 
     case 'asmSPoffset':
       const asmSPoffsetBinary = asmSPoffset(opcode, parts[2]);
       console.log(asmSPoffsetBinary);
-      break;
-
+      return asmSPoffsetBinary.replace(/\s/g, '');
 
     case 'asmArithmetic':
       const asmArithmeticBinary = asmArithmetic(opcode, parts[1], parts[2], parts[3]);
       console.log(asmArithmeticBinary);
-      break;
+      return asmArithmeticBinary.replace(/\s/g, '');
 
     case 'asmArithmetic2':
       const asmArithmetic2Binary = asmArithmetic2(opcode, parts[1], parts[2], parts[3]);
       console.log(asmArithmetic2Binary);
-      break;
+      return asmArithmetic2Binary.replace(/\s/g, '');
 
     case 'asmArithmetic3':
       const asmArithmetic3Binary = asmArithmetic3(opcode, parts[1], parts[2]);
       console.log(asmArithmetic3Binary);
-      break;
-
+      return asmArithmetic3Binary.replace(/\s/g, '');
 
     case 'asmDataCompute':
       const asmDataComputeBinary = asmDataCompute(opcode, parts[1], parts[2]);
       console.log(asmDataComputeBinary);
-      break;
+      return asmDataComputeBinary.replace(/\s/g, '');
   }
+  return '';
 }
 
 
@@ -353,66 +352,43 @@ function immToBinary(imm: number | string, encoded: number): string {
 
 
 
-
-function asmShift(parts: string[]) {
-  const opcode = parts[0];
-  const rd = parts[1];
-  const rm = parts[2];
-  const rs = parts[3];
-
-  const rdValue = parseInt(rd.replace('R', ''));
-  const rmValue = parseInt(rm.replace('R', ''));
-  const rsValue = parseInt(rs.replace('R', ''));
-
-  const rdBinary = rdValue.toString(2).padStart(3, '0');
-  const rmBinary = rmValue.toString(2).padStart(3, '0');
-  const rsBinary = rsValue.toString(2).padStart(3, '0');
-
-  const opcodeBinary = {
-    'LSLS': '000',
-    'LSRS': '001',
-    'ASRS': '010'
-  }[opcode];
-
-  return `00${opcodeBinary}${rsBinary}${rmBinary}${rdBinary}0000`;
+function binaryToHex(binaryString: string): string {
+  if (binaryString.length !== 16) throw new Error('La chaîne doit être de 16 chiffres binaires.');
+  let hexString = '';
+  for (let i = 0; i < 16; i += 4) {
+    const fourBits = binaryString.substring(i, i + 4);
+    hexString += parseInt(fourBits, 2).toString(16).toUpperCase();
+  }
+  return hexString;
 }
 
 
 async function main() {
   const filename = process.argv[2];
-  if (!filename) {
-    console.error("No input file specified.");
-    return;
-  }
+  if (!filename) return console.error("No input file specified.");
 
   const fileStream = fs.createReadStream(filename);
+  const rl = readline.createInterface({ input: fileStream, crlfDelay: Infinity });
 
-
-  const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity
-  });
-
-
+  const hexInstructions: string[] = [];
   for await (const line of rl) {
     // Skip empty lines and comments
-    if (line.trim() === '' || line.trim().startsWith('@') || line.trim().startsWith('#')) {
-      continue;
-    }
-    asm(line);
-
-
+    if (line.trim() === '' || line.trim().startsWith('@') || line.trim().startsWith('#')) continue;
+    const binaryLine = asm(line);
+    const hex = binaryToHex(binaryLine)
+    hexInstructions.push(hex);
   }
+  console.log(hexInstructions);
 
   const outputFilename = path.basename(filename, path.extname(filename)) + '.bin';
   const outputStream = fs.createWriteStream(outputFilename);
   outputStream.write("v2.0 raw\n");
 
-  // for (const [binary] of instructions) {
-  //   outputStream.write(`${binary.toString(16)} `);
-  // }
+  for (const hexInstruction of hexInstructions) {
+    outputStream.write(`${hexInstruction} `);
+  }
 
   outputStream.end();
-  // console.log(`Assembled file written to ${outputFilename}`);
+  console.log(`Assembled file written to ${outputFilename}`);
 }
 main().catch(err => console.error(err));
