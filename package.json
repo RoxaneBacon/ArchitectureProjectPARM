@@ -7,7 +7,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "start": "npx tsc parser.ts --watch",
+    "start": "npx tsc parser2.ts --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
