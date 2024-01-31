@@ -19,12 +19,15 @@ type OPcode =
 
   'ANDS' | 'EORS' | 'LSLS' | 'LSRS' | 'ASRS' | 'ADCS' | 'SBCS' | 'RORS' | 'TST' | 'RSBS' | 'CMP' | 'CMN' | 'ORRS' | 'MULS' | 'BICS' | 'MVNS' |    // asmDataCompute
 
-  'BEQ' | 'BNE' | 'BCS' | 'BHS' | 'BCC' | 'BLO' | 'BMI' | 'BPL' | 'BVS' | 'BVC' | 'BHI' | 'BLS' | 'BGE' | 'BLT' | 'BGT' | 'BLE' | 'BAL' // asmBranch
+  'BEQ' | 'BNE' | 'BCS' | 'BHS' | 'BCC' | 'BLO' | 'BMI' | 'BPL' | 'BVS' | 'BVC' | 'BHI' | 'BLS' | 'BGE' | 'BLT' | 'BGT' | 'BLE' | 'BAL' | // asmBranch
+  
+  'B' // asmBranch2
 ;
 
 
 type AssembleMethod =
-'asmRegisterOperation' | 'asmSPStorage' | 'asmSPoffset' | 'asmBranch' |
+'asmRegisterOperation' | 'asmSPStorage' | 'asmSPoffset' |
+'asmBranch' | 'asmBranch2' |
 'asmArithmetic' | 'asmArithmetic2' | 'asmArithmetic3' |
 'asmDataCompute' ;
 
@@ -191,6 +194,97 @@ const instructions: Instruction[] = [
     pattern: /^MVNS\s+R(\d+),\s+R(\d+)$/,
     assemble: 'asmDataCompute',
   },
+
+  {
+    opcode: 'BEQ',
+    pattern: /^BEQ\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BNE',
+    pattern: /^BNE\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BCS',
+    pattern: /^BCS\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BHS',
+    pattern: /^BHS\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BCC',
+    pattern: /^BCC\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BLO',
+    pattern: /^BLO\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BMI',
+    pattern: /^BMI\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BPL',
+    pattern: /^BPL\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BVS',
+    pattern: /^BVS\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BVC',
+    pattern: /^BVC\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BHI',
+    pattern: /^BHI\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BLS',
+    pattern: /^BLS\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BGE',
+    pattern: /^BGE\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BLT',
+    pattern: /^BLT\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BGT',
+    pattern: /^BGT\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BLE',
+    pattern: /^BLE\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'BAL',
+    pattern: /^BAL\s+\..+$/,
+    assemble: 'asmBranch',
+  },
+  {
+    opcode: 'B',
+    pattern: /^B\s+\..+$/,
+    assemble: 'asmBranch2',
+  }
 ]
 
 function extractSP(input: string): number | null {
@@ -200,7 +294,7 @@ function extractSP(input: string): number | null {
 }
 
 
-function asm(line:string) {
+function asm(line:string, labels: Map<string, number>, lineNumber: number) {
   line = line.toUpperCase()
   const parts = line.split(' ');
   const opcode = parts[0].toUpperCase() as OPcode;
@@ -253,8 +347,54 @@ function asm(line:string) {
       const asmDataComputeBinary = asmDataCompute(opcode, parts[1], parts[2]);
       console.log(asmDataComputeBinary);
       return asmDataComputeBinary.replace(/\s/g, '');
+
+    case 'asmBranch':
+      const asmBranchBinary = asmBranch(opcode, parts[1], labels, lineNumber);
+      console.log(asmBranchBinary);
+      return asmBranchBinary.replace(/\s/g, '');
+
+    case 'asmBranch2':
+      const asmBranch2Binary = asmBranch2(parts[1], labels, lineNumber);
+      console.log(asmBranch2Binary);
+      return asmBranch2Binary.replace(/\s/g, '');
   }
-  return '';
+}
+
+
+function asmBranch2(label: string, labels: Map<string, number>, lineNumber: number): string {
+  const labelAddress = labels.get(label);
+  if (labelAddress === undefined) throw new Error(`Label ${label} not found.`);
+  const offset = labelAddress - lineNumber - 3;
+  const offsetEncoded = 11;
+  return `11100 ${immToBinary(offset, offsetEncoded)}`;
+}
+
+
+function asmBranch(opcode: string, label: string, labels: Map<string, number>, lineNumber: number): string {
+  const labelAddress = labels.get(label);
+  if (labelAddress === undefined) throw new Error(`Label ${label} not found.`);
+  const offset = labelAddress - lineNumber - 3;
+  const offsetEncoded = 8;
+  const opcodeBinary = {
+    'BEQ': '0000',
+    'BNE': '0001',
+    'BCS': '0010',
+    'BHS': '0010',
+    'BCC': '0011',
+    'BLO': '0011',
+    'BMI': '0100',
+    'BPL': '0101',
+    'BVS': '0110',
+    'BVC': '0111',
+    'BHI': '1000',
+    'BLS': '1001',
+    'BGE': '1010',
+    'BLT': '1011',
+    'BGT': '1100',
+    'BLE': '1101',
+    'BAL': '1110'
+  }[opcode];
+  return `1101 ${opcodeBinary} ${immToBinary(offset, offsetEncoded)}`;
 }
 
 
@@ -370,13 +510,41 @@ async function main() {
   const fileStream = fs.createReadStream(filename);
   const rl = readline.createInterface({ input: fileStream, crlfDelay: Infinity });
 
-  const hexInstructions: string[] = [];
+  const labels = new Map<string, number>();
+
+  let lineNumber = 0;
+
+  const lines: string[] = [];
+
   for await (const line of rl) {
+    lines.push(line);
+  }
+
+  for (const line of lines) {
+    lineNumber++;
+    const labelMatch = line.match(/^([.\w]+)\s*:/);
+    if (labelMatch) {
+      console.log(`Label ${labelMatch[1]} found at address ${lineNumber}`);
+      labels.set(labelMatch[1], lineNumber);
+      continue;
+    }
+  }
+
+  lineNumber = 0
+  
+  const hexInstructions: string[] = [];
+  for (let line of lines) {
+    line = line.trim()
     // Skip empty lines and comments
-    if (line.trim() === '' || line.trim().startsWith('@') || line.trim().startsWith('#')) continue;
-    const binaryLine = asm(line);
+    if (line === '' || line.startsWith('@') || line.startsWith('#') || line.startsWith('.')) continue;
+
+    console.log(`Line ${lineNumber}: ${line}`);
+
+    const binaryLine = asm(line, labels, lineNumber);
     const hex = binaryToHex(binaryLine)
     hexInstructions.push(hex);
+
+    lineNumber++;
   }
   console.log(hexInstructions);
 
