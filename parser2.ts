@@ -39,8 +39,18 @@ const instructions: Instruction[] = [
     assemble: 'asmSPStorage'
   },
   {
+    opcode: 'STR',
+    pattern: /^STR\s+R(\d+),\s+\[sp\]$/gi,
+    assemble: 'asmSPStorage'
+  },
+  {
     opcode: 'LDR',
     pattern: /^LDR\s+R(\d+),\s+\[sp, #(\d+)\]$/gi,
+    assemble: 'asmSPStorage',
+  },
+  {
+    opcode: 'LDR',
+    pattern: /^LDR\s+R(\d+),\s+\[sp\]$/gi,
     assemble: 'asmSPStorage',
   },
 
@@ -305,10 +315,10 @@ function asm(line:string, labels: Map<string, number>, lineNumber: number) {
     return null;
   })
   
-  if (!instruction) return ''
-  console.log(`Invalid instruction: ${line}`)
+  if (!instruction) throw new Error(`Invalid instruction: ${line}`);
 
-  console.log('\n'+instruction.assemble + ': '+ line);
+  console.log(`\nLine ${lineNumber}: ${line}`);
+  console.log(instruction.assemble + ': '+ line);
 
   switch (instruction.assemble) {
     case 'asmRegisterOperation':
@@ -317,8 +327,8 @@ function asm(line:string, labels: Map<string, number>, lineNumber: number) {
       return asmRegisterOperationBinary.replace(/\s/g, '');
 
     case 'asmSPStorage':
-      const spOffset = extractSP(line);
-      if (spOffset === null) throw new Error(`Invalid STR instruction: ${line}`);
+      let spOffset = extractSP(line);
+      if (spOffset === null) spOffset = 0;
       const asmSPStorageBinary = asmSPStorage(opcode, parts[1], spOffset)
       console.log(asmSPStorageBinary);
       return asmSPStorageBinary.replace(/\s/g, '');
@@ -361,20 +371,44 @@ function asm(line:string, labels: Map<string, number>, lineNumber: number) {
 }
 
 
+function padLeftZeros(inputString: string, length: number): string {
+  if (inputString.length >= length) {
+      return inputString;
+  }
+  let result = inputString;
+  while (result.length < length) {
+      result = '0' + result;
+  }
+  return result;
+}
+
+
+
 function asmBranch2(label: string, labels: Map<string, number>, lineNumber: number): string {
   const labelAddress = labels.get(label);
   if (labelAddress === undefined) throw new Error(`Label ${label} not found.`);
-  const offset = labelAddress - lineNumber - 3;
-  const offsetEncoded = 11;
-  return `11100 ${immToBinary(offset, offsetEncoded)}`;
+  const calcul = labelAddress - lineNumber - 3;
+  let imm11: string;
+  if (calcul < 0) {
+    imm11 = padLeftZeros((calcul >>> 0).toString(2).substring(21), 11);
+  } else {
+    imm11 = padLeftZeros(calcul.toString(2), 8);
+  }
+  return `11100 ${imm11}`;
 }
 
 
 function asmBranch(opcode: string, label: string, labels: Map<string, number>, lineNumber: number): string {
   const labelAddress = labels.get(label);
   if (labelAddress === undefined) throw new Error(`Label ${label} not found.`);
-  const offset = labelAddress - lineNumber - 3;
-  const offsetEncoded = 8;
+  const calcul = labelAddress - lineNumber - 3;
+  let imm8: string;
+  if (calcul < 0) {
+    imm8 = padLeftZeros((calcul >>> 0).toString(2).substring(24), 8);
+  } else {
+    imm8 = padLeftZeros(calcul.toString(2), 8);
+  }
+
   const opcodeBinary = {
     'BEQ': '0000',
     'BNE': '0001',
@@ -394,7 +428,7 @@ function asmBranch(opcode: string, label: string, labels: Map<string, number>, l
     'BLE': '1101',
     'BAL': '1110'
   }[opcode];
-  return `1101 ${opcodeBinary} ${immToBinary(offset, offsetEncoded)}`;
+  return `1101 ${opcodeBinary} ${imm8}`;
 }
 
 
@@ -537,8 +571,6 @@ async function main() {
     line = line.trim()
     // Skip empty lines and comments
     if (line === '' || line.startsWith('@') || line.startsWith('#') || line.startsWith('.')) continue;
-
-    console.log(`Line ${lineNumber}: ${line}`);
 
     const binaryLine = asm(line, labels, lineNumber);
     const hex = binaryToHex(binaryLine)

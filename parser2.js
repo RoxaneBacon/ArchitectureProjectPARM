@@ -53,8 +53,18 @@ var instructions = [
         assemble: 'asmSPStorage'
     },
     {
+        opcode: 'STR',
+        pattern: /^STR\s+R(\d+),\s+\[sp\]$/gi,
+        assemble: 'asmSPStorage'
+    },
+    {
         opcode: 'LDR',
         pattern: /^LDR\s+R(\d+),\s+\[sp, #(\d+)\]$/gi,
+        assemble: 'asmSPStorage',
+    },
+    {
+        opcode: 'LDR',
+        pattern: /^LDR\s+R(\d+),\s+\[sp\]$/gi,
         assemble: 'asmSPStorage',
     },
     {
@@ -309,9 +319,9 @@ function asm(line, labels, lineNumber) {
         return null;
     });
     if (!instruction)
-        return '';
-    console.log("Invalid instruction: ".concat(line));
-    console.log('\n' + instruction.assemble + ': ' + line);
+        throw new Error("Invalid instruction: ".concat(line));
+    console.log("\nLine ".concat(lineNumber, ": ").concat(line));
+    console.log(instruction.assemble + ': ' + line);
     switch (instruction.assemble) {
         case 'asmRegisterOperation':
             var asmRegisterOperationBinary = asmRegisterOperation(opcode, parts[1], parts[2], parts[3]);
@@ -320,7 +330,7 @@ function asm(line, labels, lineNumber) {
         case 'asmSPStorage':
             var spOffset = extractSP(line);
             if (spOffset === null)
-                throw new Error("Invalid STR instruction: ".concat(line));
+                spOffset = 0;
             var asmSPStorageBinary = asmSPStorage(opcode, parts[1], spOffset);
             console.log(asmSPStorageBinary);
             return asmSPStorageBinary.replace(/\s/g, '');
@@ -354,20 +364,42 @@ function asm(line, labels, lineNumber) {
             return asmBranch2Binary.replace(/\s/g, '');
     }
 }
+function padLeftZeros(inputString, length) {
+    if (inputString.length >= length) {
+        return inputString;
+    }
+    var result = inputString;
+    while (result.length < length) {
+        result = '0' + result;
+    }
+    return result;
+}
 function asmBranch2(label, labels, lineNumber) {
     var labelAddress = labels.get(label);
     if (labelAddress === undefined)
         throw new Error("Label ".concat(label, " not found."));
-    var offset = labelAddress - lineNumber - 3;
-    var offsetEncoded = 11;
-    return "11100 ".concat(immToBinary(offset, offsetEncoded));
+    var calcul = labelAddress - lineNumber - 3;
+    var imm11;
+    if (calcul < 0) {
+        imm11 = padLeftZeros((calcul >>> 0).toString(2).substring(21), 11);
+    }
+    else {
+        imm11 = padLeftZeros(calcul.toString(2), 8);
+    }
+    return "11100 ".concat(imm11);
 }
 function asmBranch(opcode, label, labels, lineNumber) {
     var labelAddress = labels.get(label);
     if (labelAddress === undefined)
         throw new Error("Label ".concat(label, " not found."));
-    var offset = labelAddress - lineNumber - 3;
-    var offsetEncoded = 8;
+    var calcul = labelAddress - lineNumber - 3;
+    var imm8;
+    if (calcul < 0) {
+        imm8 = padLeftZeros((calcul >>> 0).toString(2).substring(24), 8);
+    }
+    else {
+        imm8 = padLeftZeros(calcul.toString(2), 8);
+    }
     var opcodeBinary = {
         'BEQ': '0000',
         'BNE': '0001',
@@ -387,7 +419,7 @@ function asmBranch(opcode, label, labels, lineNumber) {
         'BLE': '1101',
         'BAL': '1110'
     }[opcode];
-    return "1101 ".concat(opcodeBinary, " ").concat(immToBinary(offset, offsetEncoded));
+    return "1101 ".concat(opcodeBinary, " ").concat(imm8);
 }
 function asmDataCompute(opcode, rd, rm) {
     var opcodeBinary = {
@@ -546,7 +578,6 @@ function main() {
                         // Skip empty lines and comments
                         if (line === '' || line.startsWith('@') || line.startsWith('#') || line.startsWith('.'))
                             continue;
-                        console.log("Line ".concat(lineNumber, ": ").concat(line));
                         binaryLine = asm(line, labels, lineNumber);
                         hex = binaryToHex(binaryLine);
                         hexInstructions.push(hex);
