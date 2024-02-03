@@ -6,3 +6,5 @@ out/
 *.gz
 
 node_modules/
+
+dist/
