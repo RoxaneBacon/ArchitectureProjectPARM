@@ -1,4 +1,4 @@
-import { asmRegisterOperation, asmSPStorage, asmSPoffset, asmArithmetic, asmArithmetic2, asmArithmetic3, asmDataCompute, asmBranch, asmBranch2, binaryToHex } from "./operations";
+import { asmRegisterOperation, asmSPStorage, asmSPoffset, asmArithmetic, asmArithmetic2, asmArithmetic3, asmDataCompute, asmBranch, asmBranchUncond, binaryToHex } from "./operations";
 
 
 type Instruction = {
@@ -364,7 +364,7 @@ export function asm(line: string, labels: Map<string, number>, lineNumber: numbe
       return asmBranchBinary.replace(/\s/g, '');
 
     case 'asmBranch2':
-      const asmBranch2Binary = asmBranch2(parts[1], labels, lineNumber);
+      const asmBranch2Binary = asmBranchUncond(parts[1], labels, lineNumber);
       console.log(asmBranch2Binary);
       return asmBranch2Binary.replace(/\s/g, '');
   }
@@ -376,34 +376,30 @@ export function findLabels(lines: string[]): Map<string, number> {
   const labels = new Map<string, number>();
   let lineNumber = 0;
   for (const line of lines) {
-    if (line.endsWith(':')) {
+    // if (line.match(/\./)) {
+    if (line === '' || line.startsWith('@') || line.startsWith('#')) continue;
+    if (line.match(/\..*:/gi)) {
       const label = line.slice(0, -1);
       labels.set(label.toUpperCase(), lineNumber);
+      continue;
     }
-    if (line === '' || line.startsWith('@') || line.startsWith('#')) continue;
     lineNumber++;
   }
   return labels;
 }
 
 export function buildHexInstruction(lines: string[], labels: Map<string, number>): string[] {
-  let lineNumber = 1;
+  let lineNumber = 0;
   const hexInstructions: string[] = [];
   for (let line of lines) {
     line = line.trim()
+    line = line.replace(/\s+/g, ' ');
     // Skip empty lines and comments
-    if (line === '' || line.startsWith('@') || line.startsWith('#')) continue;
-    
-    if (!line.startsWith('.')) {
-
-      const binaryLine = asm(line, labels, lineNumber);
-      lineNumber++
-      const hex = binaryToHex(binaryLine)
-      hexInstructions.push(hex);
-    }
-    else {
-      lineNumber++
-    }
+    if (line === '' || line.startsWith('@') || line.startsWith('#') || line.match(/\..*(?![\:])/gi) || line.match(/(?<!\.).*:/gi)) continue;
+    const binaryLine = asm(line, labels, lineNumber);
+    const hex = binaryToHex(binaryLine)
+    hexInstructions.push(hex);
+    lineNumber++
 
   }
   return hexInstructions;

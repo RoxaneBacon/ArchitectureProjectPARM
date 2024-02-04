@@ -135,7 +135,7 @@ describe('Shift add sub mov Assembly Line to Hex Conversion', () => {
 });
 
 
-describe('Branch Assembly Line to Hex Conversion', () => {
+describe('Full Branch Assembly Line to Hex Conversion', () => {
   const lines = [
     'movs r0, #0',
     'movs r1, #1',
@@ -160,7 +160,7 @@ describe('Branch Assembly Line to Hex Conversion', () => {
 
   const expected = '2000 2101 2214 4288 d4ff e7ff 4252 428a dbff e000 2032 e7f4 1883';
 
-  test('converts "%s" to hex "%s"' , () => {
+  test('branch to hex' , () => {
     const labels = findLabels(lines)
     console.log(labels);
 
@@ -169,6 +169,7 @@ describe('Branch Assembly Line to Hex Conversion', () => {
     expect(hexOutput).toBe(expected);
   });
 });
+
 // 1110 0111 1111 0100
 
 // 1101 0100 00000000
@@ -181,3 +182,18 @@ describe('Branch Assembly Line to Hex Conversion', () => {
 // ['bLT .then2', 'DBFF'], // idem
 // ['b .endif2', 'E000'], // idem
 // ['b .goto', 'E7F4'], // idem, assurez-vous que le décalage correspond à votre logique de calcul d'adresse
+
+
+// label line : 7
+// line number : 6
+// calcul : -2
+
+//   at asmBranch (operations.ts:28:11)
+
+// console.log
+// D4FE
+
+//   at asmBranch (operations.ts:56:11)
+
+// console.log
+// 1101 0100 11111110

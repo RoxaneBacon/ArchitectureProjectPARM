@@ -1,12 +1,13 @@
 
 
 
-export function asmBranch2(label: string, labels: Map<string, number>, lineNumber: number): string {
+export function asmBranchUncond(label: string, labels: Map<string, number>, lineNumber: number): string {
   const labelAddress = labels.get(label);
   if (labelAddress === undefined) throw new Error(`Label ${label} not found.`);
-  console.log("label line : "+labelAddress + '\n' +"line number : "+lineNumber);
   
   const calcul = labelAddress - lineNumber - 3;
+  console.log("label line : "+labelAddress + '\n' +"line number : "+lineNumber + '\n' + "calcul : "+calcul);
+
   let imm11: string;
   if (calcul < 0) {
     imm11 = padLeftZeros((calcul >>> 0), 32).substring(21, 32);
@@ -24,7 +25,7 @@ export function asmBranch(opcode: string, label: string, labels: Map<string, num
   if (labelAddress === undefined) throw new Error(`Label ${label} not found.`);
   const calcul = labelAddress - lineNumber - 3;
   let imm8: string;
-  console.log("label line : "+labelAddress + '\n' +"line number : "+lineNumber);
+  console.log("label line : "+labelAddress + '\n' +"line number : "+lineNumber + '\n' + "calcul : "+calcul);
 
   if (calcul < 0) {
       imm8 = padLeftZeros(calcul >>> 0, 8).substring(24);

@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "npx tsc ./parser/index.ts --watch",
-    "test": "jest --silent"
+    "test": "jest --silent",
+    "build": "npx tsc"
   },
   "jest": {
     "transform": {
