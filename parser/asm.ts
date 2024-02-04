@@ -395,7 +395,15 @@ export function buildHexInstruction(lines: string[], labels: Map<string, number>
     line = line.trim()
     line = line.replace(/\s+/g, ' ');
     // Skip empty lines and comments
-    if (line === '' || line.startsWith('@') || line.startsWith('#') || line.match(/\..*(?![\:])/gi) || line.match(/(?<!\.).*:/gi)) continue;
+    if ( line === ''
+      || line.startsWith('@')
+      || line.startsWith('#')
+      || line.match(/push/gi)
+      || line.match(/(?<!\.).*:/gi)
+      || line.match(/\.^.*(?![\:])/gi)
+      || line.match(/^ADD\s+R(\d+),\s+SP,\s+#(\d+)$/gi) // ignore clang 4 to 8 
+      || line.match(/^MOVS\s+R(\d+),\s+R(\d+)$/gi)
+      ) continue;
     const binaryLine = asm(line, labels, lineNumber);
     const hex = binaryToHex(binaryLine)
     hexInstructions.push(hex);
